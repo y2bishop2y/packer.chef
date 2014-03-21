@@ -16,6 +16,16 @@
 		"region":		 "{{user `aws_region`}}",
 		"source_ami":	 "{{user `aws_source_ami`}}",
 		"instance_type": "{{user `aws_instance_type` }}",
+		"ssh_username":	 "ubuntu",
+		"ami_name":      "packer_chef_example_{{timestamp}}",
+
+		"bundle_vol_command": "sudo -n env EC2_AMITOOL_HOME=~/.ec2/ec2-ami-tools    ~/.ec2/ec2-ami-tools/bin/ec2-bundle-vol -k {{.KeyPath}}  -u {{.AccountId}} -c {{.CertPath}} -r {{.Architecture}} -e {{.PrivatePath}}/* -d {{.Destination}} -p {{.Prefix}} --batch --no-filter",
+      	"bundle_upload_command": "sudo -n env EC2_AMITOOL_HOME=~/.ec2/ec2-ami-tools ~/.ec2/ec2-ami-tools/bin/ec2-upload-bundle -b {{.BucketName}} -m {{.ManifestPath}} -a {{.AccessKey}} -s {{.SecretKey}} -d {{.BundleDirectory}} --batch --retry",
+ 
+		"account_id":	 "{{user `account_id`}}",
+		"s3_bucket":	 "{{user `s3_bucket` }} ",
+		"x509_cert_path":	"",
+		"x509_key_path": 	"{{user `x509_key_path` }} "
 
 	}
 	],
@@ -29,6 +39,14 @@
 
 	{
 		"type":		"shell",
+		"inline": [
+			"sudo apt-get install -y ruby unzip",
+			"wget http://s3.amazonaws.com/ec2-downloads/ec2-ami-tools.zip",
+	        "sudo mkdir -p /usr/local/ec2",
+    	    "sudo unzip ec2-ami-tools.zip -d /usr/local/ec2"
+
+		],
+		"only": [ "amazon-instance" ]
 
 	}	
 	]
