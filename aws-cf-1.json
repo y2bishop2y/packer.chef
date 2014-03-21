@@ -1,0 +1,63 @@
+
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+  "Description" : "Creates an EC2 instance with our hello-world AMI",
+ 
+  "Parameters" : {
+ 
+    "KeyName" : {
+      "Description" : "Name of the production EC2 KeyPair to enable SSH to the instance",
+      "Type" : "String"
+    },
+ 
+    "InstanceImageId" : {
+      "Description" : "EC2 image id (e.g. 'ami-d9d6a6b0')",
+      "Type" : "String"
+    }
+ 
+  },
+ 
+  "Resources" : {
+ 
+    "Instance" : {
+      "Type" : "AWS::EC2::Instance",
+ 
+      "Properties" : {
+        "ImageId" : { "Ref" : "InstanceImageId" },
+        "InstanceType" : "m1.small",
+        "KeyName" : { "Ref" : "KeyName" },
+        "SecurityGroups": [ { "Ref": "InstanceSecurityGroup" } ],
+        "Tags" : [
+          {"Key" : "Name", "Value" : "HelloWorld" }
+        ]
+      }
+    },
+ 
+    "InstanceSecurityGroup" : {
+      "Type" : "AWS::EC2::SecurityGroup",
+      "Properties" : {
+        "GroupDescription" : "Open all (most) ports.",
+        "SecurityGroupIngress" : [
+          { "IpProtocol" : "tcp",
+            "FromPort" : "0",
+            "ToPort" : "65000",
+            "CidrIp" : "0.0.0.0/0"
+          },
+          { "IpProtocol" : "udp",
+            "FromPort" : "0",
+            "ToPort" : "65000",
+            "CidrIp" : "0.0.0.0/0"
+          }
+        ]
+      }
+    }
+ 
+  },
+ 
+  "Outputs" : {
+    "InstanceId" : {
+      "Description" : "InstanceId of the newly created EC2 instance",
+      "Value" : { "Ref" : "Instance" }
+    }
+  }
+}
